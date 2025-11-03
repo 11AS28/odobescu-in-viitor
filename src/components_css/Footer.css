@@ -24,3 +24,20 @@ footer a {
 footer a:hover {
   color: #ffd700; /* auriu la hover */
 }
+
+
+@media (max-width: 768px) {
+  footer {
+    font-size: 14px;
+    padding: 15px 0;
+  }
+
+  footer a {
+    margin: 0 5px;
+  }
+  
+
+  
+
+  
+}

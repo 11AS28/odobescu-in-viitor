@@ -8,6 +8,9 @@ nav.navbar {
   text-transform: uppercase;
   transition: all 0.3s ease-in-out;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: sticky !important;
+  top: 0;
+  z-index: 1000;
 }
 
 /* Brand-ul (titlul Meniu) */
@@ -70,6 +73,7 @@ nav.navbar {
   background: rgba(25, 45, 90, 0.95);
   box-shadow: 0 4px 25px rgba(0, 0, 0, 0.3);
   transition: all 0.4s ease;
+  
 }
 
 /* Responsivitate */

@@ -44,3 +44,22 @@ h1{
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
 }
 
+
+
+@media screen and (max-width: 768px) {
+  .capsula {
+    width: 50%;
+    height: auto;
+  }
+
+  .timer {
+    font-size: 2rem;
+    width: 100%;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+  }
+
+
+}

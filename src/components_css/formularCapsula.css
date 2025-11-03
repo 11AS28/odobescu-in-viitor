@@ -127,3 +127,37 @@ button:hover span:not(:nth-child(6)) {
 #label-poze{
   margin: auto;
 }
+
+
+
+
+
+@media screen and (max-width: 768px) {
+  .capsula-form {
+    width: 90%;
+    height: auto;
+    margin-top: 100px;
+  }
+
+
+
+  #label-poze {
+    margin: auto;
+  }
+
+  #label-msj {
+    font-size: 16px;
+  }
+
+  #label-poze {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+
+  button {
+    padding: 0.8em 1.5em;
+  }
+
+
+
+}

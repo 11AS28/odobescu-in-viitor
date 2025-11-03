@@ -60,3 +60,26 @@ img {
   cursor: default;
 
 }
+
+
+
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: clamp(1.5em, 8vw, 6em);
+  }
+
+  h2 {
+    font-size: clamp(1em, 5vw, 2em);
+  }
+  
+  
+  img {
+    width: auto;
+    height: auto;
+    margin: 0 auto;
+  }
+
+
+  
+}

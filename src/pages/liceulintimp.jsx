@@ -2,7 +2,8 @@ import React from 'react';
 import Nav from '../componente/nav';
 import Footer from '../componente/footer';
 import '../pages_css/liceulintimp.css';
-import Slideshow from '../componente/slideshow';
+
+import Timeline from '../componente/timeline';
 
 
 
@@ -12,7 +13,8 @@ function LiceulInTimp() {
       <Nav />
       <br />
       <h1>Liceul în Timp</h1>
-    <Slideshow />
+    <Timeline />
+    
       <Footer />
     </div>
   );

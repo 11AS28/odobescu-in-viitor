@@ -61,7 +61,7 @@ function Formular() {
     <div>
       <form className="capsula-form">
         <label htmlFor="msj" className="label-name" id="label-msj">Mesaj</label><br />
-        <input type="text" id="msj" name="msj" className="input-field" /><br />
+        <input type="text" id="msj" name="msj" className="input-field"  placeholder="Ex: Am facut 10k pe clash"/><br />
 
         <label htmlFor="poze" className="label-name" id="label-poze">Adauga Poza<input type="file" id="poze" name="poze" className="input-field" /></label><br />
         

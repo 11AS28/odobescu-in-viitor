@@ -1,87 +1,27 @@
-.slideshow, .slideshow2, .slideshow3 {
-  margin: 0 auto; /* Centrează containerul orizontal */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  @media screen and (max-width: 768px) {
-    width: 100%; /* Ajustează lățimea pentru ecrane mici */
-    height: auto; /* Ajustează înălțimea pentru ecrane mici */
-    flex-direction: column; /* Schimbă direcția flex pentru ecrane mici */
-  }
-}
-
-.mySlides, .mySlides2, .mySlides3 {
+.slideshow {
   position: relative;
   width: 100%;
-  height: 400px; 
-  object-fit: contain; 
-  border-radius: 0%;
-  background: none;
-  border: none;
-}
-
-img {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  border: none;
-  box-shadow: none;
-  outline: none;
-  pointer-events: none;
-  border-radius: 0%;
-}
-
-
-
-#parf {
-  text-align: center;
-  margin-top: 20px;
-  font-family: "Poppins", sans-serif;
-  font-weight: 500;
-  font-size: clamp(1.2em, 3vw, 2.5em);
-  color: #fdfdfd;
-  letter-spacing: 1px;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.4),
-               0 0 20px rgba(0, 229, 255, 0.3);
-  transition: transform 0.3s ease, color 0.3s ease;
-}
-
-#parf:hover {
-  transform: scale(1.05);
-  color: #FFD700;
-  text-shadow: 0 0 15px rgba(0, 229, 255, 0.6),
-               0 0 30px rgba(255, 215, 0, 0.6);
-}
-
-
-#date {
-  max-width: 800px;
-  margin: 50px auto;
-  padding: 30px;
-  background: linear-gradient(135deg, #0044aa 0%, #ffd700 100%);
+  max-width: 400px;
+  height: 200px;
+  overflow: hidden;
   border-radius: 20px;
-  font-family: "Poppins", sans-serif;
-  color: #fff;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
-  list-style: none;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+  margin: auto;
 }
 
-#date #date-li {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(8px);
-  padding: 18px 20px;
-  margin: 14px 0;
-  border-radius: 14px;
-  line-height: 1.5;
-  border-left: 5px solid rgba(255, 255, 255, 0.4);
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+.slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; 
+  opacity: 0;
+  transition: opacity 1.5s ease-in-out;
+  border-radius: 0;
+  margin: 0;
 }
 
-#date #date-li:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: translateY(-4px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+.slide.active {
+  opacity: 1;
 }
-
-
