@@ -9,6 +9,8 @@
   text-align: center;
   font-family: 'Poppins', sans-serif;
   gap: 20px;
+  z-index: 1;
+
 }
 
 .hero h1 {
@@ -25,19 +27,28 @@
 
 .hero button {
   background: white;
-  color: #2451b3;
+  color: #2451b3 !important;
   border: none;
   padding: 12px 25px;
   border-radius: 25px;
   font-size: 1rem;
   cursor: pointer;
   transition: 0.3s;
+  z-index: 10;
 }
 
 .hero button:hover {
   transform: scale(1.05);
   background: #eee;
+  z-index: 10;
 }
+
+#social {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
 @media (max-width: 768px) {
   .hero h1 {
     font-size: 2.2rem;

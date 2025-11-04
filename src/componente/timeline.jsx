@@ -34,7 +34,8 @@ function Timeline() {
 
     return (
         <section className="timeline">
-  <h2>Evoluția Colegiului</h2>
+  <h2>Evoluția</h2>
+  <br />
 
   <div className="timeline-container">
     <div className="timeline-item">

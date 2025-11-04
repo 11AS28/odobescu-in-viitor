@@ -1,10 +1,27 @@
 import React from "react";
 import { db2, storage2 } from "../folos/firebase.js";
 import { collection, addDoc } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // 👈
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; 
 import '../components_css/formularCapsula.css';
+import ReCAPTCHA from "react-google-recaptcha";
+import  { useState } from "react";
+
 
 function Formular() {
+
+
+
+const [verified, setVerified] = useState(false);
+
+const handleCaptcha = (value) => {
+  if (value) setVerified(true); // checkbox bifat
+};
+
+
+
+
+
+
 
   var mesajetrm = 0;
   const handleSubmit = async (e) => {
@@ -13,6 +30,10 @@ function Formular() {
     const msj = document.getElementById("msj").value;
     const poze = document.getElementById("poze").files[0];
 
+    if (!verified) {
+      alert("reCAPTCHA nu a fost completat.");
+      return;
+    }
     if (!msj && !poze) {
       alert("Completează un câmp!");
       return;
@@ -65,6 +86,16 @@ function Formular() {
 
         <label htmlFor="poze" className="label-name" id="label-poze">Adauga Poza<input type="file" id="poze" name="poze" className="input-field" /></label><br />
         
+
+
+<ReCAPTCHA id="captcha"
+  sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+  onChange={handleCaptcha}
+/>
+
+<br />
+
+
       
         <button type="button" className="submit-button-form" id="form-send" onClick={handleSubmit}>
           <span className="circle1"></span>
@@ -76,6 +107,7 @@ function Formular() {
     
         </button>
       </form>
+      <br />
     </div>
   );
 }

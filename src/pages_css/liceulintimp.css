@@ -12,3 +12,25 @@ body{
 div{
     align-items: center;
 }
+
+#istorie {
+  margin: 20px auto;
+  max-width: 800px; 
+  font-size: 18px;
+  text-align: justify;
+  line-height: 1.6;
+  font-family: 'Georgia', serif;
+  color: azure;
+}
+
+
+@media (max-width: 768px) {
+  #istorie {
+    padding: 0 15px;
+    font-size: 16px;
+    line-height: 1.5;
+    max-width: 500px;
+
+  }
+    
+}
