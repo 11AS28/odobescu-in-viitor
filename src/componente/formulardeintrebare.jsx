@@ -7,7 +7,7 @@ export default function QuestionForm() {
   const [className, setClassName] = useState("");
   const [text, setText] = useState("");
 
-  const wordCount = text.trim().split(/\s+/).length;
+  const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
   const charCount = text.length;
 
   const handleSubmit = async (e) => {
@@ -29,15 +29,18 @@ export default function QuestionForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 bg-white rounded-2xl shadow-md max-w-lg mx-auto">
-      <h2 className="text-xl font-semibold mb-2">🧑‍🎓 Pune o întrebare!</h2>
+    <form 
+      onSubmit={handleSubmit} 
+      className="p-6 rounded-2xl shadow-md max-w-lg mx-auto bg-transparent"
+    >
+      <h2 className="text-xl font-semibold mb-4 text-white">🧑‍🎓 Pune o întrebare!</h2>
 
       <input
         type="text"
         placeholder="Nume (opțional)"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        className="w-full border p-2 mb-2 rounded"
+        className="w-full border border-white/50 p-3 mb-3 rounded-lg bg-transparent text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-400"
       />
 
       <input
@@ -45,21 +48,23 @@ export default function QuestionForm() {
         placeholder="Clasa (ex: 9A)"
         value={className}
         onChange={(e) => setClassName(e.target.value)}
-        className="w-full border p-2 mb-2 rounded"
+        className="w-full border border-white/50 p-3 mb-3 rounded-lg bg-transparent text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-400"
       />
 
       <textarea
         placeholder="Scrie întrebarea ta..."
         value={text}
         onChange={(e) => setText(e.target.value)}
-        className="w-full border p-2 mb-2 rounded"
+        className="w-full border border-white/50 p-3 mb-3 rounded-lg bg-transparent text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none min-h-[100px]"
       />
 
-      <div className="text-sm text-gray-500 mb-2">
+      <div className="text-sm text-white/70 mb-3">
         {wordCount} cuvinte • {charCount} caractere
       </div>
 
-      <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+      <button 
+        className="bg-blue-500 text-white px-5 py-2 rounded-lg hover:bg-blue-600 transition"
+      >
         Trimite
       </button>
     </form>

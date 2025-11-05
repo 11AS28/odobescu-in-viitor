@@ -5,7 +5,7 @@
   justify-content: center;
   align-items: center;
   background: linear-gradient(135deg, #1E3C72, #2A5298, #FDC830);
-  color: rgb(255, 255, 255);
+  color: rgb(184, 103, 103);
   text-align: center;
   font-family: 'Poppins', sans-serif;
   gap: 20px;
@@ -24,7 +24,7 @@
 }
 
 .hero button {
-  background: white;
+  background: rgb(138, 49, 49);
   color: #2451b3;
   border: none;
   padding: 12px 25px;
@@ -36,5 +36,5 @@
 
 .hero button:hover {
   transform: scale(1.05);
-  background: #eee;
+  background: #b37b7b;
 }
