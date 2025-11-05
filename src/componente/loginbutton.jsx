@@ -1,16 +1,29 @@
-import { auth, login, logout } from "../folos/firebase";
-import { useAuthState } from "react-firebase-hooks/auth";
+import { signInWithPopup } from "firebase/auth";
+import { auth, provider, db } from "../folos/firebase2";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 
-export default function LoginButton() {
-  const [user] = useAuthState(auth);
+function LoginButton() {
+  const login = async () => {
+    const result = await signInWithPopup(auth, provider);
 
-  return user ? (
-    <div>
-      <span>Salut, {user.displayName} 👋</span>
-      <button onClick={logout}>Logout</button>
-    </div>
-  ) : (
-    <button onClick={login}>Login cu Google</button>
-    
+    const user = result.user;
+    const userRef = doc(db, "users", user.uid);
+    const snap = await getDoc(userRef);
+
+    if (!snap.exists()) {
+      await setDoc(userRef, {
+        name: user.displayName,
+        email: user.email,
+        createdAt: Date.now()
+      });
+    }
+  };
+
+  return (
+    <button onClick={login}>
+      Login cu Google
+    </button>
   );
 }
+
+export default LoginButton;

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { db } from "../folos/firebase";
-import { collection, doc, onSnapshot, updateDoc } from "firebase/firestore";
+import { db, auth } from "../folos/firebase";
+import { collection, doc, onSnapshot, updateDoc, setDoc, getDoc } from "firebase/firestore";
 import AnswerForm from "./AnswerForm";
 
 export default function QuestionList() {
@@ -14,11 +14,25 @@ export default function QuestionList() {
     return unsubscribe;
   }, []);
 
-  // funcția pentru like-uri
   const handleLike = async (questionId, answerIndex) => {
+    const user = auth.currentUser;
+    if (!user) return alert("Trebuie să fii logat!");
+
+    const likeRef = doc(db, "questions", questionId, "answers", `answer${answerIndex}`, "likes", user.uid);
+    const snap = await getDoc(likeRef);
+
+    if (snap.exists()) {
+      alert("Ai dat deja like!");
+      return;
+    }
+
+    // adaugă like-ul userului în subcolectie
+    await setDoc(likeRef, { likedAt: Date.now() });
+
+    // actualizează numărul de like-uri în array-ul answers
     const question = questions.find((q) => q.id === questionId);
     const updatedAnswers = [...question.answers];
-    updatedAnswers[answerIndex].likes += 1;
+    updatedAnswers[answerIndex].likes = (updatedAnswers[answerIndex].likes || 0) + 1;
 
     await updateDoc(doc(db, "questions", questionId), {
       answers: updatedAnswers,
@@ -52,7 +66,7 @@ export default function QuestionList() {
                     onClick={() => handleLike(q.id, idx)}
                     className="flex items-center gap-1 text-red-500 hover:text-red-600"
                   >
-                    ❤️ {a.likes}
+                    ❤️ {a.likes || 0}
                   </button>
                 </div>
               ))
