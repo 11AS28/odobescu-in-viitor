@@ -5,11 +5,19 @@ import LoginButton from '../componente/loginbutton';
 
 
 function WelcomePage() {
+  
+  
+  
+loginButton.addEventListener("click", () => {
+  login(); // funcția signInWithPopup
+});
+
   return (
     <div>
       <Nav />
       <Welcome />
       <LoginButton/>
+      
       <Footer/>
     </div>
   );

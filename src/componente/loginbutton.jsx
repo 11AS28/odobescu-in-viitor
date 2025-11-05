@@ -11,5 +11,6 @@ export default function LoginButton() {
     </div>
   ) : (
     <button onClick={login}>Login cu Google</button>
+    
   );
 }
