@@ -1,8 +1,9 @@
+// src/folos/firebase2.js
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// Config din .env
+// Configurarea Firebase din .env
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY_4,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN_4,
@@ -13,7 +14,7 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID_4
 };
 
-// ✅ Dacă există deja, folosește app existent
+// Initializează aplicația Firebase (doar o dată)
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
 // Auth și Firestore
@@ -21,6 +22,21 @@ export const auth = getAuth(app);
 export const provider = new GoogleAuthProvider();
 export const db = getFirestore(app);
 
-// Funcții login/logout
-export const login = () => signInWithPopup(auth, provider);
-export const logout = () => signOut(auth);
+// Funcții utile pentru login/logout
+export const loginWithGoogle = async () => {
+  try {
+    const result = await signInWithPopup(auth, provider);
+    return result.user;
+  } catch (error) {
+    console.error("Eroare la login:", error);
+    throw error;
+  }
+};
+
+export const logout = async () => {
+  try {
+    await signOut(auth);
+  } catch (error) {
+    console.error("Eroare la logout:", error);
+  }
+};
