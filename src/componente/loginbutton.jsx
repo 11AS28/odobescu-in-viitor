@@ -1,29 +1,30 @@
-import { signInWithPopup } from "firebase/auth";
-import { auth, provider, db } from "../folos/firebase2";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import React from "react";
+import { login, logout, auth } from "../folos/firebase2";
 
-function LoginButton() {
-  const login = async () => {
-    const result = await signInWithPopup(auth, provider);
-
-    const user = result.user;
-    const userRef = doc(db, "users", user.uid);
-    const snap = await getDoc(userRef);
-
-    if (!snap.exists()) {
-      await setDoc(userRef, {
-        name: user.displayName,
-        email: user.email,
-        createdAt: Date.now()
-      });
+export default function LoginButton() {
+  const handleLogin = async () => {
+    const user = await login();
+    if (user) {
+      console.log("User logged in:", user.displayName);
     }
   };
 
+  const handleLogout = async () => {
+    await logout();
+    console.log("User logged out");
+  };
+
   return (
-    <button onClick={login}>
-      Login cu Google
-    </button>
+    <div>
+      {auth.currentUser ? (
+        <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded">
+          Logout
+        </button>
+      ) : (
+        <button onClick={handleLogin} className="bg-blue-500 text-white px-4 py-2 rounded">
+          Login cu Google
+        </button>
+      )}
+    </div>
   );
 }
-
-export default LoginButton;
