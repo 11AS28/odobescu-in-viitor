@@ -2,6 +2,7 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
+// Config din .env
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY_4,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN_4,
@@ -12,25 +13,14 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID_4
 };
 
-// Initialize Firebase
+// ✅ Dacă există deja, folosește app existent
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
+// Auth și Firestore
 export const auth = getAuth(app);
 export const provider = new GoogleAuthProvider();
 export const db = getFirestore(app);
 
-export const login = async () => {
-  try {
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
-    console.log("User logged in:", user.displayName, user.email);
-    return user;
-  } catch (error) {
-    console.error("Login failed:", error);
-    alert(error.message);
-  }
-};
-
-export const logout = async () => {
-  await signOut(auth);
-};
+// Funcții login/logout
+export const login = () => signInWithPopup(auth, provider);
+export const logout = () => signOut(auth);
