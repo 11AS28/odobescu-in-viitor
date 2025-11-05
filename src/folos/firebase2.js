@@ -12,6 +12,7 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID_4
 };
 
+
 // Verificăm dacă există deja un app
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
