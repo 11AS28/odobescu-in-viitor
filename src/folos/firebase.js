@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
 import { getStorage } from "firebase/storage";
 
@@ -37,3 +37,12 @@ const analytics2 = getAnalytics(app2);
 const storage2 = getStorage(app2);
 
 export { app, auth, db, analytics, app2, db2, analytics2, storage2 }; // ✅ export auth
+
+
+
+
+
+
+const provider = new GoogleAuthProvider();
+
+export const auth2 = getAuth(app2); // Auth pentru a doua aplicație

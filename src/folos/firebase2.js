@@ -15,7 +15,7 @@ const firebaseConfig = {
 };
 
 // Initializează aplicația Firebase (doar o dată)
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+//const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
 // Auth și Firestore
 export const auth = getAuth(app);

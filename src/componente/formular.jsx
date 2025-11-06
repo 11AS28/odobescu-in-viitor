@@ -3,7 +3,7 @@ import { db2, storage2 } from "../folos/firebase.js";
 import { collection, addDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; 
 import '../components_css/formularCapsula.css';
-import ReCAPTCHA from "react-google-recaptcha";
+
 import  { useState } from "react";
 
 
@@ -13,9 +13,6 @@ function Formular() {
 
 const [verified, setVerified] = useState(false);
 
-const handleCaptcha = (value) => {
-  if (value) setVerified(true); // checkbox bifat
-};
 
 
 
@@ -30,10 +27,6 @@ const handleCaptcha = (value) => {
     const msj = document.getElementById("msj").value;
     const poze = document.getElementById("poze").files[0];
 
-    if (!verified) {
-      alert("reCAPTCHA nu a fost completat.");
-      return;
-    }
     if (!msj && !poze) {
       alert("Completează un câmp!");
       return;
@@ -88,10 +81,7 @@ const handleCaptcha = (value) => {
         
 
 
-<ReCAPTCHA id="captcha"
-  sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
-  onChange={handleCaptcha}
-/>
+
 
 <br />
 
