@@ -1,6 +1,5 @@
-import { Button } from "./buton";
+
 import { ArrowRight } from "lucide-react";
-import heroCampus from '../assets/fatada_prezent2.webp';
 
 const Hero = () => {
   return (
@@ -8,7 +7,7 @@ const Hero = () => {
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
         <img
-          src={heroCampus}
+          src="./liceu/fatada_prezent.webp"
           alt="Alexandru Odobescu High School Campus"
           className="w-full h-full object-cover"
         />
@@ -27,20 +26,10 @@ const Hero = () => {
           pregătind elevii pentru un viitor plin de posibilități
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-in-right">
-          <Button
-            size="lg"
-            className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold text-lg px-8"
-          >
-            Explorează Viziunea Noastră
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
-          <Button
-            size="lg"
-            variant="outline"
-            className="border-2 border-white text-white hover:bg-white hover:text-primary font-semibold text-lg px-8"
-          >
-            Tur Virtual
-          </Button>
+        <button>Explorează Viziunea Noastră
+            <ArrowRight className="ml-2 h-5 w-5" /></button>
+            
+          
         </div>
       </div>
 

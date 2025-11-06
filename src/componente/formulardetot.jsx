@@ -47,7 +47,7 @@ export default function QuestionList() {
 
   return (
     <div className="max-w-2xl mx-auto mt-6">
-      <h2 className="text-2xl font-bold mb-4 text-white">💬 Întrebările bobocilor</h2>
+      <h2 className="text-2xl font-bold mb-4 text-white">💬 Întrebările elevilor</h2>
 
       {questions.map((q) => (
         <div key={q.id} className="p-4 rounded-2xl mb-4 shadow-md bg-white/10 backdrop-blur-md">

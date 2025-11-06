@@ -24,13 +24,17 @@ function Nav() {
         <div className="collapse navbar-collapse" id="collapsibleNavbar">
           <ul className="navbar-nav">
             <li className="nav-item">
-              <a className="nav-link" href="/pareri">Parerile elevilor</a>
+              <a className="nav-link" href="/intrebari">Intrebarile elevilor</a>
             </li>
             <li className="nav-item">
               <a className="nav-link" href="/capsula-timpului">Capsula timpului</a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="/liceul-de-a-lungul-timpului">Liceul de-a lungul timpului</a>
+              <a className="nav-link" href="/colegiul-de-a-lungul-timpului">Colegiul de-a lungul timpului</a>
+
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="/odobescu-3d">Odobescu 3D Experience</a>
             </li>
           </ul>
         </div>

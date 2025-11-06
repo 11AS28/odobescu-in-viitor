@@ -4,13 +4,19 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #1E3C72, #2A5298, #FDC830);
+
   color: rgb(255, 255, 255);
   text-align: center;
   font-family: 'Poppins', sans-serif;
   gap: 20px;
-  z-index: 1;
+  z-index: 10;
 
+}
+.bgg{
+  background-image: url('public/liceu/fatada_prezent.webp');
+  background-size: cover;
+  background-position: center;
+  
 }
 
 .hero h1 {
