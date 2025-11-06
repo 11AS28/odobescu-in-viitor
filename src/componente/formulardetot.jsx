@@ -9,31 +9,32 @@ export default function QuestionList() {
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "questions"), (snapshot) => {
-      // obținem toate întrebările
       const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      // sortăm după data creării (dacă există)
       const sorted = data.sort((a, b) => {
         const dateA = a.createdAt?.seconds || 0;
         const dateB = b.createdAt?.seconds || 0;
-        return dateA - dateB; // de la cele mai vechi la cele mai noi
+        return dateB - dateA; // inversăm ordinea: de la cele mai noi la cele mai vechi
       });
-      // păstrăm doar ultimele 5
-      setQuestions(sorted.slice(-5));
+      setQuestions(sorted.slice(0, 5)); // luăm primele 5 (cele mai noi)
     });
     return unsubscribe;
   }, []);
 
-  const handleLike = async (questionId, answerIndex) => {
+  const handleLike = async (questionId, answerId) => {
     const question = questions.find((q) => q.id === questionId);
-    const updatedAnswers = [...question.answers];
+    
+    // Căutăm răspunsul după ID-ul unic
+    const answerIndex = question.answers.findIndex((a) => a.id === answerId);
+    if (answerIndex === -1) return;
 
-    const key = `${questionId}-answer-${answerIndex}`;
+    const key = `${questionId}-answer-${answerId}`;
     if (localStorage.getItem(key)) {
       alert("Ai dat deja like la răspunsul ăsta 😅");
       return;
     }
     localStorage.setItem(key, "true");
 
+    const updatedAnswers = [...question.answers];
     updatedAnswers[answerIndex].likes = (updatedAnswers[answerIndex].likes || 0) + 1;
 
     await updateDoc(doc(db, "questions", questionId), {
@@ -72,9 +73,9 @@ export default function QuestionList() {
                   .slice()
                   .sort((a, b) => (b.likes || 0) - (a.likes || 0))
                   .slice(0, 3)
-                  .map((a, idx) => (
+                  .map((a) => (
                     <div
-                      key={idx}
+                      key={a.id}
                       className="flex justify-between items-center mb-2 rounded-xl p-2 bg-white/10"
                     >
                       <div>
@@ -83,8 +84,8 @@ export default function QuestionList() {
                         </p>
                       </div>
                       <button
-                        onClick={() => handleLike(q.id, idx)}
-                        className="flex items-center gap-1 text-red-400 hover:text-red-500"
+                        onClick={() => handleLike(q.id, a.id)}
+                        className="flex items-center gap-1 text-red-400 hover:text-red-500 shrink-0"
                       >
                         ❤️ {a.likes || 0}
                       </button>
@@ -106,33 +107,50 @@ export default function QuestionList() {
           </div>
 
           <AnswerForm questionId={q.id} />
+
+          {/* Modal pentru această întrebare */}
+          {showModalId === q.id && (
+            <div 
+              className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+              onClick={() => setShowModalId(null)}
+            >
+              <div 
+                className="bg-gray-900 p-6 rounded-xl max-w-lg w-full text-white max-h-[400px] overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h3 className="text-lg font-bold mb-4">Toate răspunsurile</h3>
+                {q.answers
+                  .slice()
+                  .sort((a, b) => (b.likes || 0) - (a.likes || 0))
+                  .map((a) => (
+                    <div 
+                      key={a.id} 
+                      className="mb-2 p-2 rounded-lg bg-white/10 flex justify-between items-center gap-2"
+                    >
+                      <div className="flex-1">
+                        <p>
+                          <strong>{a.author}:</strong> {a.text}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => handleLike(q.id, a.id)}
+                        className="flex items-center gap-1 text-red-400 hover:text-red-500 shrink-0"
+                      >
+                        ❤️ {a.likes || 0}
+                      </button>
+                    </div>
+                  ))}
+                <button
+                  onClick={() => setShowModalId(null)}
+                  className="mt-4 px-4 py-2 bg-blue-500 rounded hover:bg-blue-600 w-full"
+                >
+                  Închide
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       ))}
-
-      {showModalId && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-gray-900 p-6 rounded-xl max-w-lg w-full text-white max-h-[400px] overflow-y-auto">
-            <h3 className="text-lg font-bold mb-4">Toate răspunsurile</h3>
-            {questions
-              .find((q) => q.id === showModalId)
-              .answers.sort((a, b) => (b.likes || 0) - (a.likes || 0))
-              .map((a, idx) => (
-                <div key={idx} className="mb-2 p-2 rounded-lg bg-white/10">
-                  <p>
-                    <strong>{a.author}:</strong> {a.text}
-                  </p>
-                  <p className="text-red-400">❤️ {a.likes || 0}</p>
-                </div>
-              ))}
-            <button
-              onClick={() => setShowModalId(null)}
-              className="mt-4 px-4 py-2 bg-blue-500 rounded hover:bg-blue-600"
-            >
-              Închide
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

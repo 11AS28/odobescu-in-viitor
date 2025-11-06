@@ -43,6 +43,26 @@ function ThreeD() {
 ></iframe>
 
 <br />
+        <br />
+<h3>Laboratorul de biologie</h3>
+
+
+ <iframe id="randare"
+    title="School Lab"
+    src="https://sketchfab.com/models/a97f74bfd83644858af7216f794504b6/embed"
+    width="768px"
+    height="600"
+    allow="autoplay; fullscreen"
+    allowFullScreen
+    style={{
+      border: "none",
+      borderRadius: "12px",
+      maxWidth: "1000px",
+    }}
+  ></iframe>
+
+
+<br />
         <Footer />
     </div>
   );

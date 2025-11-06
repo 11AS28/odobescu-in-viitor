@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { db } from "../folos/firebase"; // importă inițializarea ta
-import { collection, addDoc } from "firebase/firestore";
+import { db } from "../folos/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 export default function QuestionForm() {
   const [name, setName] = useState("");
@@ -14,18 +14,27 @@ export default function QuestionForm() {
     e.preventDefault();
     if (!text.trim()) return;
 
-    await addDoc(collection(db, "questions"), {
-      author: name || "Anonim",
-      class: className,
-      text,
-      wordCount,
-      charCount,
-      answers: [],
-    });
+    try {
+      await addDoc(collection(db, "questions"), {
+        author: name || "Anonim",
+        class: className || "N/A",
+        text: text.trim(),
+        wordCount,
+        charCount,
+        answers: [],
+        createdAt: serverTimestamp(),
+      });
 
-    setName("");
-    setClassName("");
-    setText("");
+      // Resetare formular după trimitere
+      setName("");
+      setClassName("");
+      setText("");
+      
+      alert("✅ Întrebarea ta a fost trimisă!");
+    } catch (error) {
+      console.error("Eroare la trimiterea întrebării:", error);
+      alert("❌ A apărut o eroare. Încearcă din nou!");
+    }
   };
 
   return (
@@ -55,6 +64,7 @@ export default function QuestionForm() {
         placeholder="Scrie întrebarea ta..."
         value={text}
         onChange={(e) => setText(e.target.value)}
+        required
         className="w-full border border-white/50 p-3 mb-3 rounded-lg bg-transparent text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none min-h-[100px]"
       />
 
@@ -63,7 +73,9 @@ export default function QuestionForm() {
       </div>
 
       <button 
-        className="bg-blue-500 text-white px-5 py-2 rounded-lg hover:bg-blue-600 transition"
+        type="submit"
+        disabled={!text.trim()}
+        className="bg-blue-500 text-white px-5 py-2 rounded-lg hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Trimite
       </button>
