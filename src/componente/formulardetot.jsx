@@ -9,8 +9,16 @@ export default function QuestionList() {
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "questions"), (snapshot) => {
+      // obținem toate întrebările
       const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setQuestions(data);
+      // sortăm după data creării (dacă există)
+      const sorted = data.sort((a, b) => {
+        const dateA = a.createdAt?.seconds || 0;
+        const dateB = b.createdAt?.seconds || 0;
+        return dateA - dateB; // de la cele mai vechi la cele mai noi
+      });
+      // păstrăm doar ultimele 5
+      setQuestions(sorted.slice(-5));
     });
     return unsubscribe;
   }, []);
@@ -19,7 +27,6 @@ export default function QuestionList() {
     const question = questions.find((q) => q.id === questionId);
     const updatedAnswers = [...question.answers];
 
-    // previne spam de like-uri (localStorage)
     const key = `${questionId}-answer-${answerIndex}`;
     if (localStorage.getItem(key)) {
       alert("Ai dat deja like la răspunsul ăsta 😅");
@@ -33,9 +40,8 @@ export default function QuestionList() {
       answers: updatedAnswers,
     });
 
-    // update local, instant
-    setQuestions(prev =>
-      prev.map(q => q.id === questionId ? { ...q, answers: updatedAnswers } : q)
+    setQuestions((prev) =>
+      prev.map((q) => (q.id === questionId ? { ...q, answers: updatedAnswers } : q))
     );
   };
 
@@ -47,10 +53,13 @@ export default function QuestionList() {
 
   return (
     <div className="max-w-2xl mx-auto mt-6">
-      <h2 className="text-2xl font-bold mb-4 text-white">💬 Întrebările elevilor</h2>
+      <h2 className="text-2xl font-bold mb-4 text-white">💬 Întrebările bobocilor</h2>
 
       {questions.map((q) => (
-        <div key={q.id} className="p-4 rounded-2xl mb-4 shadow-md bg-white/10 backdrop-blur-md">
+        <div
+          key={q.id}
+          className="p-4 rounded-2xl mb-4 shadow-md bg-white/10 backdrop-blur-md"
+        >
           <p className="font-medium text-white">{q.text}</p>
           <p className="text-sm text-white/70 mt-1">
             — {q.author} ({q.class}) • {formatDate(q.createdAt)}
@@ -105,12 +114,13 @@ export default function QuestionList() {
           <div className="bg-gray-900 p-6 rounded-xl max-w-lg w-full text-white max-h-[400px] overflow-y-auto">
             <h3 className="text-lg font-bold mb-4">Toate răspunsurile</h3>
             {questions
-              .find(q => q.id === showModalId)
-              .answers
-              .sort((a, b) => (b.likes || 0) - (a.likes || 0))
+              .find((q) => q.id === showModalId)
+              .answers.sort((a, b) => (b.likes || 0) - (a.likes || 0))
               .map((a, idx) => (
                 <div key={idx} className="mb-2 p-2 rounded-lg bg-white/10">
-                  <p><strong>{a.author}:</strong> {a.text}</p>
+                  <p>
+                    <strong>{a.author}:</strong> {a.text}
+                  </p>
                   <p className="text-red-400">❤️ {a.likes || 0}</p>
                 </div>
               ))}
