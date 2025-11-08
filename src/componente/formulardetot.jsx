@@ -1,40 +1,82 @@
 import { useEffect, useState } from "react";
+// Importăm funcțiile 'query' și 'where' necesare
+import { collection, doc, onSnapshot, updateDoc, query, where } from "firebase/firestore"; 
 import { db } from "../folos/firebase";
-import { collection, doc, onSnapshot, updateDoc } from "firebase/firestore";
 import AnswerForm from "./AnswerForm";
 
 export default function QuestionList() {
   const [questions, setQuestions] = useState([]);
   const [showModalId, setShowModalId] = useState(null);
-  const [openAnswerFormId, setOpenAnswerFormId] = useState(null); // id-ul întrebării pentru care se afișează formularul
+  const [openAnswerFormId, setOpenAnswerFormId] = useState(null);
+  
+  const [startTime, setStartTime] = useState(null);
+  const [showOnlyNew, setShowOnlyNew] = useState(false); 
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, "questions"), (snapshot) => {
+    // Setează timpul de start la prima montare a componentei
+    if (!startTime) {
+      setStartTime(new Date()); 
+    }
+
+    let questionsRef = collection(db, "questions");
+    let q = questionsRef;
+
+    // Aplică filtrarea pentru mesaje noi dacă filtrul este activ
+    if (showOnlyNew && startTime) {
+      q = query(
+        questionsRef,
+        where("createdAt", ">=", startTime),
+        // Adăugarea unui orderBy pe createdAt este adesea necesară
+        // pentru a crea indexul necesar operațiilor de range (>=)
+      );
+    } 
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      
       const sorted = data.sort((a, b) => {
         const dateA = a.createdAt?.seconds || 0;
         const dateB = b.createdAt?.seconds || 0;
         return dateB - dateA;
       });
-      setQuestions(sorted.slice(0, 5));
+      
+      // MODIFICARE: Afișează toate întrebările (fără limită)
+      setQuestions(sorted); 
     });
+    
     return unsubscribe;
-  }, []);
+  }, [startTime, showOnlyNew]);
 
+  // Funcție ajutătoare pentru a verifica starea like-ului din localStorage
+  const hasUserLiked = (questionId, answerId) => {
+    const key = `${questionId}-answer-${answerId}`;
+    return localStorage.getItem(key) === "liked";
+  };
+  
+  // Logica de Like/Unlike
   const handleLike = async (questionId, answerId) => {
     const question = questions.find((q) => q.id === questionId);
     const answerIndex = question.answers.findIndex((a) => a.id === answerId);
     if (answerIndex === -1) return;
 
     const key = `${questionId}-answer-${answerId}`;
-    if (localStorage.getItem(key)) {
-      alert("Ai dat deja like la răspunsul ăsta 😅");
-      return;
-    }
-    localStorage.setItem(key, "true");
+    const hasLiked = localStorage.getItem(key) === "liked"; 
 
     const updatedAnswers = [...question.answers];
-    updatedAnswers[answerIndex].likes = (updatedAnswers[answerIndex].likes || 0) + 1;
+    const currentLikes = updatedAnswers[answerIndex].likes || 0;
+    let newLikes;
+
+    if (hasLiked) {
+      // Un-like: Decrementăm
+      newLikes = Math.max(0, currentLikes - 1); 
+      localStorage.removeItem(key); 
+    } else {
+      // Like: Incrementăm
+      newLikes = currentLikes + 1;
+      localStorage.setItem(key, "liked"); 
+    }
+
+    updatedAnswers[answerIndex].likes = newLikes;
 
     await updateDoc(doc(db, "questions", questionId), {
       answers: updatedAnswers,
@@ -55,6 +97,21 @@ export default function QuestionList() {
     <div className="max-w-2xl mx-auto mt-6">
       <h2 className="text-2xl font-bold mb-4 text-white">💬 Întrebările bobocilor</h2>
 
+      {/* Buton pentru comutarea filtrului NOU/TOATE */}
+      <div className="mb-4">
+        <button
+          onClick={() => setShowOnlyNew(!showOnlyNew)}
+          className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
+            showOnlyNew
+              ? "bg-red-500 text-white hover:bg-red-600"
+              : "bg-white/10 text-white/80 hover:bg-white/20"
+          }`}
+        >
+          {showOnlyNew ? "🔴 Arată Toate Mesajele" : "🟢 Arată Doar Mesajele Noi (Începând de Acum)"}
+        </button> ? "🔴 Arată Toate Mesajele" : "🟢 Arată Doar Mesajele Noi (Începând de Acum)"}
+        </button>-->
+      </div>
+      
       {questions.map((q) => (
         <div
           key={q.id}
@@ -68,28 +125,34 @@ export default function QuestionList() {
           <div className="mt-3 pl-3 border-l-2 border-white/30">
             {q.answers && q.answers.length > 0 ? (
               <>
+                {/* Nu mai avem slice(0, 3) aici, dar arătăm doar primele 3 răspunsuri sortate */}
                 {q.answers
                   .slice()
                   .sort((a, b) => (b.likes || 0) - (a.likes || 0))
-                  .slice(0, 3)
-                  .map((a) => (
-                    <div
-                      key={a.id}
-                      className="flex justify-between items-center mb-2 rounded-xl p-2 bg-white/10"
-                    >
-                      <div>
-                        <p className="text-sm text-white">
-                          <strong>{a.author}:</strong> {a.text}
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => handleLike(q.id, a.id)}
-                        className="flex items-center gap-1 text-red-400 hover:text-red-500 shrink-0"
+                  .slice(0, 3) // Păstrăm slice(0, 3) pentru a afișa doar primele 3 RĂSPUNSURI
+                  .map((a) => {
+                    const liked = hasUserLiked(q.id, a.id); 
+                    return (
+                      <div
+                        key={a.id}
+                        className="flex justify-between items-center mb-2 rounded-xl p-2 bg-white/10"
                       >
-                        ❤️ {a.likes || 0}
-                      </button>
-                    </div>
-                  ))}
+                        <div>
+                          <p className="text-sm text-white">
+                            <strong>{a.author}:</strong> {a.text}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => handleLike(q.id, a.id)}
+                          className={`flex items-center gap-1 shrink-0 ${
+                            liked ? "text-red-500 hover:text-red-400" : "text-gray-400 hover:text-red-400"
+                          }`}
+                        >
+                          {liked ? "❤️" : "🤍"} {a.likes || 0}
+                        </button>
+                      </div>
+                    );
+                  })}
 
                 {q.answers.length > 3 && (
                   <button
@@ -134,24 +197,29 @@ export default function QuestionList() {
                 {q.answers
                   .slice()
                   .sort((a, b) => (b.likes || 0) - (a.likes || 0))
-                  .map((a) => (
-                    <div
-                      key={a.id}
-                      className="mb-2 p-2 rounded-lg bg-white/10 flex justify-between items-center gap-2"
-                    >
-                      <div className="flex-1">
-                        <p>
-                          <strong>{a.author}:</strong> {a.text}
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => handleLike(q.id, a.id)}
-                        className="flex items-center gap-1 text-red-400 hover:text-red-500 shrink-0"
+                  .map((a) => {
+                    const liked = hasUserLiked(q.id, a.id); 
+                    return (
+                      <div
+                        key={a.id}
+                        className="mb-2 p-2 rounded-lg bg-white/10 flex justify-between items-center gap-2"
                       >
-                        ❤️ {a.likes || 0}
-                      </button>
-                    </div>
-                  ))}
+                        <div className="flex-1">
+                          <p>
+                            <strong>{a.author}:</strong> {a.text}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => handleLike(q.id, a.id)}
+                          className={`flex items-center gap-1 shrink-0 ${
+                            liked ? "text-red-500 hover:text-red-400" : "text-gray-400 hover:text-red-400"
+                          }`}
+                        >
+                          {liked ? "❤️" : "🤍"} {a.likes || 0}
+                        </button>
+                      </div>
+                    );
+                  })}
                 <button
                   onClick={() => setShowModalId(null)}
                   className="mt-4 px-4 py-2 bg-blue-500 rounded hover:bg-blue-600 w-full"
