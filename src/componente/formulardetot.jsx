@@ -6,6 +6,7 @@ import AnswerForm from "./AnswerForm";
 export default function QuestionList() {
   const [questions, setQuestions] = useState([]);
   const [showModalId, setShowModalId] = useState(null);
+  const [openAnswerFormId, setOpenAnswerFormId] = useState(null); // id-ul întrebării pentru care se afișează formularul
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "questions"), (snapshot) => {
@@ -13,17 +14,15 @@ export default function QuestionList() {
       const sorted = data.sort((a, b) => {
         const dateA = a.createdAt?.seconds || 0;
         const dateB = b.createdAt?.seconds || 0;
-        return dateB - dateA; // inversăm ordinea: de la cele mai noi la cele mai vechi
+        return dateB - dateA;
       });
-      setQuestions(sorted.slice(0, 5)); // luăm primele 5 (cele mai noi)
+      setQuestions(sorted.slice(0, 5));
     });
     return unsubscribe;
   }, []);
 
   const handleLike = async (questionId, answerId) => {
     const question = questions.find((q) => q.id === questionId);
-    
-    // Căutăm răspunsul după ID-ul unic
     const answerIndex = question.answers.findIndex((a) => a.id === answerId);
     if (answerIndex === -1) return;
 
@@ -106,15 +105,28 @@ export default function QuestionList() {
             )}
           </div>
 
-          <AnswerForm questionId={q.id} />
+          {/* Buton pentru a deschide formularul */}
+          {openAnswerFormId !== q.id && (
+            <button
+              onClick={() => setOpenAnswerFormId(q.id)}
+              className="mt-2 bg-blue-500 px-3 py-1 rounded hover:bg-blue-600"
+            >
+              Răspunde
+            </button>
+          )}
 
-          {/* Modal pentru această întrebare */}
+          {/* Formularul apare doar când este deschis */}
+          {openAnswerFormId === q.id && (
+            <AnswerForm questionId={q.id} onClose={() => setOpenAnswerFormId(null)} />
+          )}
+
+          {/* Modal pentru toate răspunsurile */}
           {showModalId === q.id && (
-            <div 
+            <div
               className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
               onClick={() => setShowModalId(null)}
             >
-              <div 
+              <div
                 className="bg-gray-900 p-6 rounded-xl max-w-lg w-full text-white max-h-[400px] overflow-y-auto"
                 onClick={(e) => e.stopPropagation()}
               >
@@ -123,8 +135,8 @@ export default function QuestionList() {
                   .slice()
                   .sort((a, b) => (b.likes || 0) - (a.likes || 0))
                   .map((a) => (
-                    <div 
-                      key={a.id} 
+                    <div
+                      key={a.id}
                       className="mb-2 p-2 rounded-lg bg-white/10 flex justify-between items-center gap-2"
                     >
                       <div className="flex-1">

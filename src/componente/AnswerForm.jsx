@@ -2,40 +2,71 @@ import { useState } from "react";
 import { db } from "../folos/firebase";
 import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 
-export default function AnswerForm({ questionId }) {
+export default function AnswerForm({ questionId, onClose }) {
   const [answer, setAnswer] = useState("");
   const [author, setAuthor] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!answer.trim()) return;
+
+    if (!author.trim()) {
+      setError("❌ Trebuie să introduci un nume.");
+      return;
+    }
+
+    if (!answer.trim()) {
+      setError("❌ Trebuie să scrii un răspuns.");
+      return;
+    }
 
     const questionRef = doc(db, "questions", questionId);
     await updateDoc(questionRef, {
-      answers: arrayUnion({ author: author || "Anonim", text: answer, likes: 0 }),
+      answers: arrayUnion({ author: author.trim(), text: answer.trim(), likes: 0 }),
     });
 
     setAnswer("");
     setAuthor("");
+    setError("");
+    if (onClose) onClose(); // Închide formularul după trimitere
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mt-3">
+    <form className="mt-3 relative border p-3 rounded bg-white/10" onSubmit={handleSubmit}>
+      
+      {/* Buton X în colț */}
+      {onClose && (
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-2 right-2 text-white bg-red-500 hover:bg-red-600 rounded-full w-6 h-6 flex items-center justify-center font-bold"
+        >
+          ×
+        </button>
+      )}
+
+      {error && <p className="text-red-400 mb-1">{error}</p>}
+
       <input
         type="text"
-        placeholder="Nume (opțional)"
+        placeholder="Nume (obligatoriu)"
         value={author}
         onChange={(e) => setAuthor(e.target.value)}
         className="border p-1 rounded w-full mb-1"
       />
+
       <textarea
         placeholder="Răspunde la întrebare..."
         value={answer}
         onChange={(e) => setAnswer(e.target.value)}
         className="border p-1 rounded w-full mb-1"
       />
-      <button className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
-        Răspunde
+
+      <button
+        type="submit"
+        className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 w-full mt-1"
+      >
+        Trimite răspuns
       </button>
     </form>
   );

@@ -4,13 +4,13 @@ import '../components_css/nav.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { Routes, Route } from 'react-router-dom';
-
+import WelcomePage from "../pages/welcome_page.jsx";
 
 function Nav() {
   return (
     <div>
       <nav className="navbar navbar-expand-md bg-dark navbar-dark">
-        <a className="navbar-brand" href="/">Meniu</a>
+        <a className="navbar-brand" href="/welcome_page">Acasa</a>
 
         <button
           className="navbar-toggler"
