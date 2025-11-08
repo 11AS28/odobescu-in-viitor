@@ -27,7 +27,6 @@ export default function QuestionList() {
         questionsRef,
         where("createdAt", ">=", startTime),
         // Adăugarea unui orderBy pe createdAt este adesea necesară
-        // pentru a crea indexul necesar operațiilor de range (>=)
       );
     } 
 
@@ -40,7 +39,7 @@ export default function QuestionList() {
         return dateB - dateA;
       });
       
-      // MODIFICARE: Afișează toate întrebările (fără limită)
+      // Afișează toate întrebările (fără limită)
       setQuestions(sorted); 
     });
     
@@ -97,7 +96,7 @@ export default function QuestionList() {
     <div className="max-w-2xl mx-auto mt-6">
       <h2 className="text-2xl font-bold mb-4 text-white">💬 Întrebările bobocilor</h2>
 
-      {/* Buton pentru comutarea filtrului NOU/TOATE */}
+      {/* Buton pentru comutarea filtrului NOU/TOATE (SECȚIUNE REPARATĂ) */}
       <div className="mb-4">
         <button
           onClick={() => setShowOnlyNew(!showOnlyNew)}
@@ -108,8 +107,7 @@ export default function QuestionList() {
           }`}
         >
           {showOnlyNew ? "🔴 Arată Toate Mesajele" : "🟢 Arată Doar Mesajele Noi (Începând de Acum)"}
-        </button> ? "🔴 Arată Toate Mesajele" : "🟢 Arată Doar Mesajele Noi (Începând de Acum)"}
-        </button>-->
+        </button>
       </div>
       
       {questions.map((q) => (
@@ -125,11 +123,11 @@ export default function QuestionList() {
           <div className="mt-3 pl-3 border-l-2 border-white/30">
             {q.answers && q.answers.length > 0 ? (
               <>
-                {/* Nu mai avem slice(0, 3) aici, dar arătăm doar primele 3 răspunsuri sortate */}
+                {/* Arătăm doar primele 3 răspunsuri sortate după like-uri */}
                 {q.answers
                   .slice()
                   .sort((a, b) => (b.likes || 0) - (a.likes || 0))
-                  .slice(0, 3) // Păstrăm slice(0, 3) pentru a afișa doar primele 3 RĂSPUNSURI
+                  .slice(0, 3) 
                   .map((a) => {
                     const liked = hasUserLiked(q.id, a.id); 
                     return (
