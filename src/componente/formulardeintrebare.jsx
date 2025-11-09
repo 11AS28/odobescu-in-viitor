@@ -15,26 +15,23 @@ export default function QuestionForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validare nume
     if (!name.trim()) {
       setError("❌ Trebuie să introduci un nume.");
       return;
     }
 
-    // Validare format clasa (ex: 9A, 10b, 12H)
     const classRegex = /^(9|10|11|12)[A-Ha-h]$/;
     if (!classRegex.test(className.trim())) {
       setError("❌ Clasa trebuie să fie între 9A și 12H (ex: 10b).");
       return;
     }
 
-    // Validare text întrebare
     if (!text.trim()) {
       setError("❌ Trebuie să scrii o întrebare.");
       return;
     }
 
-    setError(""); // resetăm eroarea dacă totul e ok
+    setError("");
 
     try {
       await addDoc(collection(db, "questions"), {
@@ -43,11 +40,10 @@ export default function QuestionForm() {
         text: text.trim(),
         wordCount,
         charCount,
-        answers: [],
+        answers: [], // Răspunsurile sunt inițial un array gol
         createdAt: serverTimestamp(),
       });
 
-      // Resetare formular după trimitere
       setName("");
       setClassName("");
       setText("");

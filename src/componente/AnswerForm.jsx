@@ -19,16 +19,32 @@ export default function AnswerForm({ questionId, onClose }) {
       setError("❌ Trebuie să scrii un răspuns.");
       return;
     }
+    
+    // 💡 CORECȚIA CRITICĂ: Creăm un ID unic pentru răspuns.
+    const newAnswer = {
+        id: Date.now().toString(), // ID UNIC
+        author: author.trim(), 
+        text: answer.trim(), 
+        likes: 0 
+    };
 
     const questionRef = doc(db, "questions", questionId);
-    await updateDoc(questionRef, {
-      answers: arrayUnion({ author: author.trim(), text: answer.trim(), likes: 0 }),
-    });
+    
+    // Folosim noul obiect newAnswer cu ID unic
+    try {
+        await updateDoc(questionRef, {
+            answers: arrayUnion(newAnswer),
+        });
 
-    setAnswer("");
-    setAuthor("");
-    setError("");
-    if (onClose) onClose(); // Închide formularul după trimitere
+        setAnswer("");
+        setAuthor("");
+        setError("");
+        if (onClose) onClose(); // Închide formularul după trimitere
+        
+    } catch (e) {
+        console.error("Eroare la adăugarea răspunsului:", e);
+        setError("❌ Eroare la salvarea răspunsului.");
+    }
   };
 
   return (

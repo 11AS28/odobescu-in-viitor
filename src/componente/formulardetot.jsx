@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-// Importăm funcțiile 'query' și 'where' necesare
 import { collection, doc, onSnapshot, updateDoc, query, where } from "firebase/firestore"; 
 import { db } from "../folos/firebase";
 import AnswerForm from "./AnswerForm";
@@ -13,37 +12,47 @@ export default function QuestionList() {
   const [startTime, setStartTime] = useState(null);
   const [showOnlyNew, setShowOnlyNew] = useState(false); 
 
-  useEffect(() => {
-    // Setează timpul de start la prima montare a componentei
+  // QuestionList.js - NOUA VERSIUNE A useEffect
+
+useEffect(() => {
     if (!startTime) {
       setStartTime(new Date()); 
     }
 
     let questionsRef = collection(db, "questions");
     let q = questionsRef;
-
-    // Aplică filtrarea pentru mesaje noi dacă filtrul este activ
-    if (showOnlyNew && startTime) {
-      q = query(
-        questionsRef,
-        where("createdAt", ">=", startTime),
-        // Adăugarea unui orderBy pe createdAt este adesea necesară
-      );
-    } 
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      
-      const sorted = data.sort((a, b) => {
-        const dateA = a.createdAt?.seconds || 0;
-        const dateB = b.createdAt?.seconds || 0;
-        return dateB - dateA;
-      });
-      
-      // Afișează toate întrebările (fără limită)
-      setQuestions(sorted); 
-    });
     
+    // Simplificăm interogarea la Firestore: facem doar filtrarea pe timp (dacă e activă)
+    // NU mai folosim where("isPinned", "!=", true)
+    if (showOnlyNew && startTime) {
+        q = query(
+            questionsRef,
+            where("createdAt", ">=", startTime)
+            // NOTĂ: Pentru a folosi where pe createdAt, probabil vei avea nevoie și de orderBy("createdAt", "desc")
+        );
+    } 
+    // Dacă showOnlyNew este fals, luăm toate întrebările (fără filtre complexe)
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+        const allData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        
+        // --- SEPARAREA ȘI SORTAREA DATELOR SE FACE ACUM LOCAL ÎN REACT ---
+        
+        const pinned = allData.filter(q => q.isPinned);
+        const nonPinned = allData.filter(q => !q.isPinned);
+
+        // Sortăm datele normale după dată
+        const sortedNonPinned = nonPinned.sort((a, b) => {
+            const dateA = a.createdAt?.seconds || 0;
+            const dateB = b.createdAt?.seconds || 0;
+            return dateB - dateA;
+        });
+        
+        // Setează starea: Pinned la început, urmat de cele normale sortate.
+        setQuestions([...pinned, ...sortedNonPinned]);
+    });
+
+    // Păstrăm o singură funcție de unsubscribe
     return unsubscribe;
   }, [startTime, showOnlyNew]);
 
@@ -53,11 +62,17 @@ export default function QuestionList() {
     return localStorage.getItem(key) === "liked";
   };
   
-  // Logica de Like/Unlike
+  // Logica de Like/Unlike (Rămâne neschimbată și este corectă)
   const handleLike = async (questionId, answerId) => {
     const question = questions.find((q) => q.id === questionId);
+    if (!question) return;
+    
     const answerIndex = question.answers.findIndex((a) => a.id === answerId);
-    if (answerIndex === -1) return;
+    
+    if (answerIndex === -1) {
+        console.error(`Answer ID ${answerId} not found.`);
+        return;
+    }
 
     const key = `${questionId}-answer-${answerId}`;
     const hasLiked = localStorage.getItem(key) === "liked"; 
@@ -67,24 +82,22 @@ export default function QuestionList() {
     let newLikes;
 
     if (hasLiked) {
-      // Un-like: Decrementăm
       newLikes = Math.max(0, currentLikes - 1); 
       localStorage.removeItem(key); 
     } else {
-      // Like: Incrementăm
       newLikes = currentLikes + 1;
       localStorage.setItem(key, "liked"); 
     }
 
     updatedAnswers[answerIndex].likes = newLikes;
 
-    await updateDoc(doc(db, "questions", questionId), {
-      answers: updatedAnswers,
-    });
-
     setQuestions((prev) =>
       prev.map((q) => (q.id === questionId ? { ...q, answers: updatedAnswers } : q))
     );
+    
+    await updateDoc(doc(db, "questions", questionId), {
+      answers: updatedAnswers,
+    });
   };
 
   const formatDate = (timestamp) => {
@@ -98,7 +111,6 @@ export default function QuestionList() {
     <div className="max-w-2xl mx-auto mt-6" id="formInt">
       <h2 className="text-2xl font-bold mb-4 text-white">💬 Întrebările elevilor</h2>
 
-      {/* Buton pentru comutarea filtrului NOU/TOATE (SECȚIUNE REPARATĂ) */}
       <div className="mb-4" id="formInt">
         <button
           onClick={() => setShowOnlyNew(!showOnlyNew)}
@@ -115,8 +127,13 @@ export default function QuestionList() {
       {questions.map((q) => (
         <div
           key={q.id}
-          className="p-4 rounded-2xl mb-4 shadow-md bg-white/10 backdrop-blur-md"
+          // Aplicăm stilul de evidențiere bazat pe noul câmp isPinned
+          className={`p-4 rounded-2xl mb-4 shadow-md backdrop-blur-md 
+                   ${q.isPinned ? 'bg-yellow-700/70 border-2 border-yellow-400' : 'bg-white/10'}`} 
         >
+            {/* Afișăm eticheta Pinned */}
+            {q.isPinned && <p className="text-sm font-bold text-yellow-200 mb-2">📌 Mesaj Fixat (Important)</p>}
+            
           <p className="font-medium text-white">{q.text}</p>
           <p className="text-sm text-white/70 mt-1">
             — {q.author} ({q.class}) • {formatDate(q.createdAt)}
@@ -172,7 +189,7 @@ export default function QuestionList() {
           {openAnswerFormId !== q.id && (
             <button
               onClick={() => setOpenAnswerFormId(q.id)}
-              className="mt-2 bg-blue-500 px-3 py-1 rounded hover:bg-blue-600"
+              className="mt-2 bg-blue-500 px-3 py-1 rounded hover:bg-blue-600 text-white"
             >
               Răspunde
             </button>
@@ -183,57 +200,41 @@ export default function QuestionList() {
             <AnswerForm questionId={q.id} onClose={() => setOpenAnswerFormId(null)} />
           )}
 
-          {/* Modal pentru toate răspunsurile */}
+          {/* Modal pentru toate răspunsurile (Logica modalului rămâne la fel) */}
           {showModalId === q.id && (
-  <div
-    className="modal-overlay"
-    onClick={() => setShowModalId(null)}
-  >
-    <div
-      className="modal-content"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <h3>Toate răspunsurile</h3>
-      {q.answers
-        .slice()
-        .sort((a, b) => (b.likes || 0) - (a.likes || 0))
-        .map((a) => {
-          const liked = hasUserLiked(q.id, a.id);
-          return (
-            <div key={a.id} style={{
-              marginBottom: '10px',
-              padding: '10px',
-              borderRadius: '8px',
-              background: 'rgba(255,255,255,0.1)',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}>
-              <p><strong>{a.author}:</strong> {a.text}</p>
-              <button onClick={() => handleLike(q.id, a.id)}>
-                {liked ? "❤️" : "🤍"} {a.likes || 0}
-              </button>
+            <div className="modal-overlay" onClick={() => setShowModalId(null)}>
+                <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                    <h3>Toate răspunsurile</h3>
+                    {q.answers
+                        .slice()
+                        .sort((a, b) => (b.likes || 0) - (a.likes || 0))
+                        .map((a) => {
+                        const liked = hasUserLiked(q.id, a.id);
+                        return (
+                            <div key={a.id} style={{
+                            marginBottom: '10px', padding: '10px', borderRadius: '8px',
+                            background: 'rgba(255,255,255,0.1)', display: 'flex',
+                            justifyContent: 'space-between', alignItems: 'center', color: 'white'
+                            }}>
+                            <p><strong>{a.author}:</strong> {a.text}</p>
+                            <button 
+                                onClick={() => handleLike(q.id, a.id)}
+                                style={{ color: liked ? "red" : "gray", background: 'none', border: 'none', cursor: 'pointer' }}
+                            >
+                                {liked ? "❤️" : "🤍"} {a.likes || 0}
+                            </button>
+                            </div>
+                        );
+                        })}
+                    <button
+                        onClick={() => setShowModalId(null)}
+                        style={{ marginTop: '10px', padding: '10px 15px', borderRadius: '8px', background: '#4f8cff', color: 'white', border: 'none', cursor: 'pointer' }}
+                    >
+                        Închide
+                    </button>
+                </div>
             </div>
-          );
-        })}
-      <button
-        onClick={() => setShowModalId(null)}
-        style={{
-          marginTop: '10px',
-          padding: '10px 15px',
-          borderRadius: '8px',
-          background: '#4f8cff',
-          color: 'white',
-          border: 'none',
-          cursor: 'pointer'
-        }}
-      >
-        Închide
-      </button>
-    </div>
-  </div>
-)}
-
+          )}
         </div>
       ))}
     </div>
