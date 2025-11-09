@@ -10,7 +10,7 @@ function Nav() {
   return (
     <div>
       <nav className="navbar navbar-expand-md bg-dark navbar-dark">
-        <a className="navbar-brand" href="/welcome_page">Acasa</a>
+        <a className="navbar-brand" href="/">Acasa</a>
 
         <button
           className="navbar-toggler"

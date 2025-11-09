@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { collection, doc, onSnapshot, updateDoc, query, where } from "firebase/firestore"; 
 import { db } from "../folos/firebase";
 import AnswerForm from "./AnswerForm";
+import "../components_css/formularpareri.css"
 
 export default function QuestionList() {
   const [questions, setQuestions] = useState([]);
@@ -93,11 +94,12 @@ export default function QuestionList() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto mt-6">
-      <h2 className="text-2xl font-bold mb-4 text-white">💬 Întrebările bobocilor</h2>
+    <div id="main-wrapper">
+    <div className="max-w-2xl mx-auto mt-6" id="formInt">
+      <h2 className="text-2xl font-bold mb-4 text-white">💬 Întrebările elevilor</h2>
 
       {/* Buton pentru comutarea filtrului NOU/TOATE (SECȚIUNE REPARATĂ) */}
-      <div className="mb-4">
+      <div className="mb-4" id="formInt">
         <button
           onClick={() => setShowOnlyNew(!showOnlyNew)}
           className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
@@ -183,52 +185,58 @@ export default function QuestionList() {
 
           {/* Modal pentru toate răspunsurile */}
           {showModalId === q.id && (
-            <div
-              className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-              onClick={() => setShowModalId(null)}
-            >
-              <div
-                className="bg-gray-900 p-6 rounded-xl max-w-lg w-full text-white max-h-[400px] overflow-y-auto"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <h3 className="text-lg font-bold mb-4">Toate răspunsurile</h3>
-                {q.answers
-                  .slice()
-                  .sort((a, b) => (b.likes || 0) - (a.likes || 0))
-                  .map((a) => {
-                    const liked = hasUserLiked(q.id, a.id); 
-                    return (
-                      <div
-                        key={a.id}
-                        className="mb-2 p-2 rounded-lg bg-white/10 flex justify-between items-center gap-2"
-                      >
-                        <div className="flex-1">
-                          <p>
-                            <strong>{a.author}:</strong> {a.text}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => handleLike(q.id, a.id)}
-                          className={`flex items-center gap-1 shrink-0 ${
-                            liked ? "text-red-500 hover:text-red-400" : "text-gray-400 hover:text-red-400"
-                          }`}
-                        >
-                          {liked ? "❤️" : "🤍"} {a.likes || 0}
-                        </button>
-                      </div>
-                    );
-                  })}
-                <button
-                  onClick={() => setShowModalId(null)}
-                  className="mt-4 px-4 py-2 bg-blue-500 rounded hover:bg-blue-600 w-full"
-                >
-                  Închide
-                </button>
-              </div>
+  <div
+    className="modal-overlay"
+    onClick={() => setShowModalId(null)}
+  >
+    <div
+      className="modal-content"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <h3>Toate răspunsurile</h3>
+      {q.answers
+        .slice()
+        .sort((a, b) => (b.likes || 0) - (a.likes || 0))
+        .map((a) => {
+          const liked = hasUserLiked(q.id, a.id);
+          return (
+            <div key={a.id} style={{
+              marginBottom: '10px',
+              padding: '10px',
+              borderRadius: '8px',
+              background: 'rgba(255,255,255,0.1)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <p><strong>{a.author}:</strong> {a.text}</p>
+              <button onClick={() => handleLike(q.id, a.id)}>
+                {liked ? "❤️" : "🤍"} {a.likes || 0}
+              </button>
             </div>
-          )}
+          );
+        })}
+      <button
+        onClick={() => setShowModalId(null)}
+        style={{
+          marginTop: '10px',
+          padding: '10px 15px',
+          borderRadius: '8px',
+          background: '#4f8cff',
+          color: 'white',
+          border: 'none',
+          cursor: 'pointer'
+        }}
+      >
+        Închide
+      </button>
+    </div>
+  </div>
+)}
+
         </div>
       ))}
+    </div>
     </div>
   );
 }

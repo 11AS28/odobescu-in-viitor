@@ -2,6 +2,8 @@ body {
   background: linear-gradient(135deg, #1E3C72, #2A5298, #FDC830);
   color: white;
     font-family: 'Poppins', sans-serif;
+    align-items: center !important;
+
 }
 
 h1 {
@@ -40,4 +42,7 @@ h2:hover {
   color: #FFD700;
   text-shadow: 0 0 15px rgba(0, 229, 255, 0.6),
                0 0 30px rgba(255, 215, 0, 0.6);
+}
+.footer{
+  align-items: center;
 }

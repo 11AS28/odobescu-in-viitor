@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { db } from "../folos/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import "../components_css/formularpareri.css"
 
 export default function QuestionForm() {
   const [name, setName] = useState("");

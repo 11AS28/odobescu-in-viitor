@@ -13,6 +13,41 @@ h1 {
 	animation: shimmer 2s linear infinite
 }
 
+#main-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* centrăm pe orizontală */
+    justify-content: flex-start;
+    margin: 0 auto;
+    padding: 20px;
+    width: 100%;
+    max-width: 1200px; /* limitează lățimea */
+    box-sizing: border-box;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;      /* ocupă tot ecranul */
+  height: 100vh;     /* ocupă tot ecranul */
+  display: flex;     /* folosește flex pentru centrare */
+  justify-content: center; /* centru pe orizontală */
+  align-items: center;     /* centru pe verticală */
+  background: rgba(0,0,0,0.5); /* fundal semi-transparent */
+  z-index: 9999;     /* să fie peste tot */
+}
+
+.modal-content {
+  background: #222;
+  color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 600px;  /* limitează lățimea */
+  width: 90%;        /* responsive */
+  max-height: 80vh;  /* să nu ocupe tot ecranul */
+  overflow-y: auto;  /* scroll dacă e prea mare */
+}
 
 
 
@@ -77,6 +112,7 @@ label {
     grid-auto-rows: minmax(150px, auto); /* rânduri flexibile */
     gap: 14px;
     margin: 80px;
+    align-items: center;
 }
 
 .message-card {
@@ -162,7 +198,10 @@ label {
 
 
 
-
+.formInt{
+  align-items: center !important;
+  
+}
 
 
 
@@ -295,7 +334,12 @@ button:hover span:not(:nth-child(6)) {
 }
 
 
-
+.main-content p{
+  text-align: justify;
+  
+  justify-content: center;
+  max-width: 800px;
+}
 
 
 @media (max-width: 768px) {
@@ -311,3 +355,4 @@ button:hover span:not(:nth-child(6)) {
         margin-bottom: 14px; /* spațiu între mesaje */
     }
 }
+
